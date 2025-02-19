@@ -2,7 +2,7 @@
 
 file_paths = ["data/sppnw41.txt", "data/sppnw42.txt", "data/sppnw43.txt"]
 
-def load_data(file_path):
+def _load_data(file_path):
     with open(file_path, 'r') as file:
         # Read the number of rows and columns
         num_rows, num_columns = map(int, file.readline().strip().split())
@@ -21,11 +21,45 @@ def load_data(file_path):
     return num_rows, num_columns, columns 
 
 
+def load_attendants():
+    data = _load_data(file_paths[0])
+    # The data is in the format (num_rows, num_columns, columns)
+    # Each column contains (column_cost, num_rows_covered, rows_covered)
+    
+    columns = data[2]  # Access the third element of the tuple
+ 
+    attendants = {}
+    for i, column_data in enumerate(columns):
+        # Generate crew IDs as 'AA', 'AB', 'AC', ..., 'BA', 'BB', etc.
+        first_letter = chr(65 + (i // 26))  # A, B, C, etc.
+        second_letter = chr(65 + (i % 26))  # A, B, C, etc.
+        crew = first_letter + second_letter
+        
+        cost = column_data[0]
+        flights = column_data[2]
+        attendants[crew] = {'cost': cost, 'flights': flights}
+
+    return attendants
+
+def load_flights():
+    data = _load_data(file_paths[0])
+    # The first item is the number of rows and columns we want to return then number if rows
+    return data[1]
 
 
-# # Test the load_data function
+
+
+# Test the load_data function
+
+
 # if __name__ == "__main__":
-#     num_rows, num_columns, columns = load_data("data/sppnw41.txt")
+#     num_rows, num_columns, columns = _load_data("data/sppnw41.txt")
 #     print(f"Number of rows: {num_rows}")
 #     print(f"Number of columns: {num_columns}")
 #     print(f"Columns: {columns}")
+
+#     attendants = load_attendants()
+#     print(f"Attendants: {attendants}")
+
+#     flights = load_flights()
+#     print(f"Flights: {flights}")
