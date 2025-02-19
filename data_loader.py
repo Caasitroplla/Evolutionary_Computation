@@ -44,13 +44,12 @@ def load_attendants():
 def load_flights():
     data = _load_data(file_paths[0])
     # The first item is the number of rows and columns we want to return then number if rows
-    return data[1]
+    return data[0]
 
 
 
 
 # Test the load_data function
-
 
 # if __name__ == "__main__":
 #     num_rows, num_columns, columns = _load_data("data/sppnw41.txt")

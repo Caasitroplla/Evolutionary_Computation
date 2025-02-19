@@ -3,68 +3,75 @@ import data_loader
 import math
 import random
 
-data = data_loader.load_data(data_loader.file_paths[0])
+def generate_initial_schedule(flights, crew):
+    # Generate a random schedule for the flights 
+    schedule = {}
+    for flight in flights:
+        eligible_crew = [crew_member for crew_member in crew if flight in crew[crew_member]['flights']]
+        schedule[flight] = random.choice(eligible_crew)
+    return schedule
 
-# We want to minimise the cost of the solution or the total column cost
-# We need to forfill 1 through to 17 crew members
+def calculate_schedule_cost(schedule, crew):
+    return sum(crew[schedule[flight]]['cost'] for flight in schedule if schedule[flight] is not None)
 
-def generate_initial_solution(data):
-    # Initialize empty solution
-    solution = []
-    crew_coverage = [0] * 17  # Track coverage for crew positions 1-17
-    
-    # Randomly select columns (flight combinations) until all crew positions are covered
-    available_columns = list(range(len(data)))
-    
-    while any(coverage < 1 for coverage in crew_coverage):
-        if not available_columns:
-            break  # Break if we run out of columns to choose from
-            
-        # Randomly select a column
-        col_idx = random.choice(available_columns)
-        available_columns.remove(col_idx)
-        
-        # Check if this column helps cover any uncovered positions
-        column = data[col_idx]
-        adds_coverage = False
-        
-        for pos in range(17):
-            if column[pos] == 1 and crew_coverage[pos] < 1:
-                adds_coverage = True
-                crew_coverage[pos] += 1
-        
-        # Add column to solution if it helps coverage
-        if adds_coverage:
-            solution.append(col_idx)
-    
-    return solution
+def get_neighbour(schedule, crew):
+    # Make a new neighbour by randomly changing an assignment within eligible crew
+    neighbour = schedule.copy()
+    flight = random.choice(list(schedule.keys()))
+    eligible_crew = [crew_member for crew_member in crew if flight in crew[crew_member]['flights']]
+    if eligible_crew:
+        neighbour[flight] = random.choice(eligible_crew)
+    return neighbour
 
-def simulated_annealing(data):
-    # Initialize the solution
-    solution = []
-    # Initialize the temperature
+def simulated_annealing(flights, crew):
+    # Initialize the schedule
+    current_schedule = generate_initial_schedule(flights, crew)
+    current_cost = calculate_schedule_cost(current_schedule, crew)
+
+    # Set the initial temperature
     temperature = 1000
-    # Initialize the cooling rate
-    cooling_rate = 0.99
-    # Initialize the number of iterations
-    num_iterations = 1000
-    # Initialize the best solution
-    best_solution = None
-    # Initialize the best cost
-    best_cost = float('inf')
+    cooling_rate = 0.95
+    min_temperature = 1
+
+    # Setting the best schedule
+    best_schedule = current_schedule.copy()
+    best_cost = current_cost
+
+    while temperature > min_temperature:
+        # Get a neighbour
+        neighbour = get_neighbour(current_schedule, crew)
+        neighbour_cost = calculate_schedule_cost(neighbour, crew)
+
+        # Accept the neighbour if it's better or with a certain probability
+        if neighbour_cost < current_cost or random.random() < math.exp((current_cost - neighbour_cost) / temperature):
+            current_schedule = neighbour
+            current_cost = neighbour_cost
+
+            # Update the best schedule if the neighbour is better
+            if neighbour_cost < best_cost:
+                best_schedule = neighbour
+                best_cost = neighbour_cost
+
+        # Cool down the temperature
+        temperature *= cooling_rate
+        # Don't let temperature go below min_temperature
+        temperature = max(temperature, min_temperature)
+
+    return best_schedule, best_cost
     
-    # Generate an initial solution
-    for _ in range(num_iterations):
-        # Generate a new solution
-        new_solution = generate_new_solution(solution)
-        # Calculate the cost of the new solution
-        new_cost = calculate_cost(new_solution)
-        
-
-
-
 
 if __name__ == "__main__":
-    solution, cost = simulated_annealing(data)
-    print(solution)
-    print(cost)
+    # Load the data
+    num_flights = data_loader.load_flights()
+    flights = list(range(1, num_flights))
+
+    attendants = data_loader.load_attendants()
+
+    # Run the simulated annealing algorithm
+    best_schedule, best_cost = simulated_annealing(flights, attendants)
+
+    # Print the best schedule and cost
+    print(f"Best schedule: {best_schedule}")
+    print(f"Best cost: {best_cost}")
+    
+    
