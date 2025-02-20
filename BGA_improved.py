@@ -13,9 +13,9 @@ def pseudo_random_initialization(flights, attendants):
         if eligible_attendants:
             assigned_attendant = random.choice(eligible_attendants)
             schedule[flight] = assigned_attendant
-            uncovered_flights.remove(flight)
+            uncovered_flights -= {flight}
         else:
-            uncovered_flights.remove(flight) # If no attendants available, leave uncovered
+            uncovered_flights -= {flight}    # If no attendants available, leave uncovered
     return schedule
 
 def heuristic_improvement(schedule, flights, attendants):
@@ -43,29 +43,30 @@ def calculate_constraint_violation(individual, flights, attendants):
     violation = 0
     assigned_flights = set(individual.keys())
     violation += len(set(flights) - assigned_flights) # Unassigned flights
-    attendant_assignment_counts = {crew: list(individual.values()).count(crew) for crew in attendants}
+    attendant_assignment_counts = {a: list(individual.values()).count(a) for a in attendants}
     max_assignments = len(flights) // len(attendants)
     violation += sum(max(0, count - max_assignments) for count in attendant_assignment_counts.values())
     return violation
 
+def calculate_fitness(x, attendants):
+    return -sum(attendants[x[flight]]['cost'] for flight in x)
+
 def stochastic_ranking(population, flights, attendants):
-    pf = 0.45
-    N = len(population)
-    # Fix: Calculate fitness by summing costs of assigned attendants in each schedule
-    fitness_values = [-sum(attendants[schedule[flight]]['cost'] for flight in schedule) for schedule in population]
-    constraint_violations = [calculate_constraint_violation(p, flights, attendants) for p in population]
-
-    for i in range(N):
-        for j in range(N - 1):
-            u = random.random()
-            if (u < pf and fitness_values[j] < fitness_values[j + 1]) or \
-               (u >= pf and constraint_violations[j] > constraint_violations[j + 1]):
-                population[j], population[j + 1] = population[j + 1], population[j]
-                fitness_values[j], fitness_values[j + 1] = fitness_values[j + 1], fitness_values[j]
-                constraint_violations[j], constraint_violations[j + 1] = constraint_violations[j + 1], constraint_violations[j]
-
-    return population
-
+    # Convert population members to tuples so they can be used as dictionary keys
+    population_tuples = [tuple(sorted(x.items())) for x in population]
+    constraints_violations = {pop_tuple: calculate_constraint_violation(dict(pop_tuple), flights, attendants) 
+                            for pop_tuple in population_tuples}
+    
+    fitness_values = [calculate_fitness(dict(pop_tuple), attendants) for pop_tuple in population_tuples]
+    
+    # Create a mapping of population tuples to fitness values
+    fitness_dict = dict(zip(population_tuples, fitness_values))
+    
+    # Sort using both dictionaries
+    population_tuples.sort(key=lambda x: (constraints_violations[x], fitness_dict[x]))
+    
+    # Convert back to dictionaries
+    return [dict(x) for x in population_tuples]
 
 def binary_genetic_algorithm(flights, attendants):
     # Define variables
@@ -74,14 +75,15 @@ def binary_genetic_algorithm(flights, attendants):
     mutation_rate = 0.1
     
     def generate_individual():
-        # Generate a random schedule
-        return pseudo_random_initialization(flights, attendants)
+        # Use more efficient dictionary comprehension like in standard version
+        return {flight: random.choice([a for a in attendants if flight in attendants[a]['flights']]) 
+                for flight in flights}
         
     def mutate(individual):
         # Perform a random mutation
         if random.random() < mutation_rate:
             flight_to_mutate = random.choice(flights)
-            eligible_attendants = [attendant for attendant in attendants if flight_to_mutate in attendants[attendant]['flights']]
+            eligible_attendants = [a for a in attendants if flight_to_mutate in attendants[a]['flights']]
             if eligible_attendants:
                 individual[flight_to_mutate] = random.choice(eligible_attendants)
         return individual
@@ -101,9 +103,9 @@ def binary_genetic_algorithm(flights, attendants):
 
             next_generation.extend([mutate(child1), mutate(child2)])
 
-        population = [heuristic_improvement(schedule, flights, attendants) for schedule in next_generation[:population_size]]
+        population = [heuristic_improvement(individual, flights, attendants) for individual in next_generation[:population_size]]
 
-    best_solution = min(population, key=lambda x: calculate_constraint_violation(x, flights, attendants))
+    best_solution = max(population, key=lambda x: - sum(attendants[x[flight]]['cost'] for flight in x))
     best_cost = sum(attendants[best_solution[flight]]['cost'] for flight in best_solution)
     return best_solution, best_cost
             
