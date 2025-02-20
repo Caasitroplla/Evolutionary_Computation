@@ -21,8 +21,8 @@ def _load_data(file_path):
     return num_rows, num_columns, columns 
 
 
-def load_attendants():
-    data = _load_data(file_paths[0])
+def load_attendants(file_path = file_paths[0]):
+    data = _load_data(file_path)
     # The data is in the format (num_rows, num_columns, columns)
     # Each column contains (column_cost, num_rows_covered, rows_covered)
     
@@ -41,8 +41,8 @@ def load_attendants():
 
     return attendants
 
-def load_flights():
-    data = _load_data(file_paths[0])
+def load_flights(file_path = file_paths[0]):
+    data = _load_data(file_path)
     # The first item is the number of rows and columns we want to return then number if rows
     return data[0]
 

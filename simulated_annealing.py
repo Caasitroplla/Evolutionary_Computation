@@ -2,17 +2,7 @@
 import data_loader
 import math
 import random
-
-def generate_initial_schedule(flights, crew):
-    # Generate a random schedule for the flights 
-    schedule = {}
-    for flight in flights:
-        eligible_crew = [crew_member for crew_member in crew if flight in crew[crew_member]['flights']]
-        schedule[flight] = random.choice(eligible_crew)
-    return schedule
-
-def calculate_schedule_cost(schedule, crew):
-    return sum(crew[schedule[flight]]['cost'] for flight in schedule if schedule[flight] is not None)
+from standard import generate_initial_schedule, calculate_schedule_cost
 
 def get_neighbour(schedule, crew):
     # Make a new neighbour by randomly changing an assignment within eligible crew
@@ -30,7 +20,7 @@ def simulated_annealing(flights, crew):
 
     # Set the initial temperature
     temperature = 1000
-    cooling_rate = 0.95
+    cooling_rate = 0.99
     min_temperature = 1
 
     # Setting the best schedule
