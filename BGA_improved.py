@@ -68,11 +68,7 @@ def stochastic_ranking(population, flights, attendants):
     # Convert back to dictionaries
     return [dict(x) for x in population_tuples]
 
-def binary_genetic_algorithm(flights, attendants):
-    # Define variables
-    population_size = 50
-    generations = 1000
-    mutation_rate = 0.1
+def binary_genetic_algorithm(flights, attendants, population_size=30, generations=10, mutation_rate=0.1):
     
     def generate_individual():
         # Use more efficient dictionary comprehension like in standard version

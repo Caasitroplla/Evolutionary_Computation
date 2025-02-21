@@ -9,6 +9,9 @@ import matplotlib.pyplot as plt
 import timeit
 import logging
 
+POPULATION_SIZE = 30
+GENERATIONS = 10
+
 if __name__ == "__main__":
     logging.basicConfig(
         format="{asctime} - {levelname} - {message}",
@@ -47,13 +50,13 @@ if __name__ == "__main__":
         # Run the algorithms 
         logging.info(f"Running BGA Improved for {data_loader.file_paths[i]}")
         start_time = timeit.default_timer()
-        BGA_improved_results = BGA_improved.binary_genetic_algorithm(flights, attendants)
+        BGA_improved_results = BGA_improved.binary_genetic_algorithm(flights, attendants, POPULATION_SIZE, GENERATIONS)
         end_time = timeit.default_timer()
         timings['BGA Improved'].append(end_time - start_time)
 
         logging.info(f"Running BGA Standard for {data_loader.file_paths[i]}")
         start_time = timeit.default_timer()
-        BGA_standard_results = BGA_standard.binary_genertic_algorithm(flights, attendants)
+        BGA_standard_results = BGA_standard.binary_genertic_algorithm(flights, attendants, POPULATION_SIZE, GENERATIONS)
         end_time = timeit.default_timer()
         timings['BGA Standard'].append(end_time - start_time)
 

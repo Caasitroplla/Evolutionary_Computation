@@ -3,11 +3,8 @@ import math
 import data_loader
 from standard import generate_initial_schedule, calculate_schedule_cost
 
-def binary_genertic_algorithm(flights, crew):
+def binary_genertic_algorithm(flights, crew, population_size=30, generations=10, mutation_rate=0.1):
     # Define variables 
-    population_size = 50
-    generations = 1000
-    mutation_rate = 0.1
 
     def generate_individual():
         # Generate a random schedule
