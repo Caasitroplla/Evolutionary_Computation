@@ -1,7 +1,8 @@
 import random
-import math
 import data_loader
-from standard import generate_initial_schedule, calculate_schedule_cost
+
+def calculate_schedule_cost(schedule, crew):
+    return sum(crew[schedule[flight]]['cost'] for flight in schedule if schedule[flight] is not None)
 
 def binary_genertic_algorithm(flights, crew, population_size=30, generations=1000, mutation_rate=0.1):
     # Define variables 

@@ -1,6 +1,9 @@
 import random
-from standard import calculate_schedule_cost
 import data_loader
+
+def calculate_schedule_cost(schedule, crew):
+    return sum(crew[schedule[flight]]['cost'] for flight in schedule if schedule[flight] is not None)
+
 
 def pseudo_random_initialization(flights, attendants):
     # Initialize the population with pseudo-random schedules
@@ -68,7 +71,7 @@ def stochastic_ranking(population, flights, attendants):
     # Convert back to dictionaries
     return [dict(x) for x in population_tuples]
 
-def binary_genetic_algorithm(flights, attendants, population_size=30, generations=5, mutation_rate=0.1):
+def binary_genetic_algorithm(flights, attendants, population_size=30, generations=2, mutation_rate=0.1):
     
     def generate_individual():
         # Use more efficient dictionary comprehension like in standard version
