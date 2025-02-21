@@ -6,7 +6,7 @@ from standard import generate_initial_schedule, calculate_schedule_cost
 def binary_genertic_algorithm(flights, crew, population_size=30, generations=10, mutation_rate=0.1):
     # Define variables 
 
-    def generate_individual():
+    def generate_schedule():
         # Generate a random schedule
         return {flight: random.choice([crew_member for crew_member in crew if flight in crew[crew_member]['flights']]) for flight in flights}
 
@@ -30,7 +30,7 @@ def binary_genertic_algorithm(flights, crew, population_size=30, generations=10,
         return individual
     
     # Initialize the population
-    population = [generate_individual() for _ in range(population_size)]
+    population = [generate_schedule() for _ in range(population_size)]
 
     for _ in range(generations):
         population = sorted(population, key=calculate_fitness, reverse=True)
