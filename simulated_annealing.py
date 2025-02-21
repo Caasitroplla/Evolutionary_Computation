@@ -23,7 +23,7 @@ def get_neighbour(schedule, crew):
         neighbour[flight] = random.choice(eligible_crew)
     return neighbour
 
-def simulated_annealing(flights, crew, temperature=1000, cooling_rate=0.99, min_temperature=1):
+def simulated_annealing(flights, crew, temperature=100000000, cooling_rate=0.99, min_temperature=1):
     # Initialize the schedule
     current_schedule = generate_initial_schedule(flights, crew)
     current_cost = calculate_schedule_cost(current_schedule, crew)

@@ -4,8 +4,9 @@ import timeit
 import statistics
 import json
 from matplotlib import pyplot as plt
+import numpy as np
 
-from data_loader import load_attendants, load_flights
+from data_loader import load_attendants, load_flights, file_paths
 
 from BGA_improved import binary_genetic_algorithm as BGA_improved
 from BGA_standard import binary_genertic_algorithm as BGA_standard
@@ -80,28 +81,45 @@ def calcualte_averages_and_standard_deviations():
 def plot_results():
     # For each algorithm plot the average cost and the standard deviation of the cost
     # and the average time and the standard deviation of the time
-    for dataset in RESULTS:
-        algorithms = list(RESULTS[dataset].keys())
-        average_costs = [RESULTS[dataset][algorithm]['average_cost'] for algorithm in algorithms]
-        standard_deviations_cost = [RESULTS[dataset][algorithm]['standard_deviation_cost'] for algorithm in algorithms]
-        average_times = [RESULTS[dataset][algorithm]['average_time'] for algorithm in algorithms]
-        standard_deviations_time = [RESULTS[dataset][algorithm]['standard_deviation_time'] for algorithm in algorithms]
+    algorithms = []
+    average_costs = []
+    standard_deviations_cost = []
+    average_times = []
+    standard_deviations_time = []
+  
+    algorithms = list(RESULTS['data/sppnw41.txt'].keys())
+    average_costs = [RESULTS['data/sppnw41.txt'][algorithm]['average_cost'] for algorithm in algorithms]
+    standard_deviations_cost = [RESULTS['data/sppnw41.txt'][algorithm]['standard_deviation_cost'] for algorithm in algorithms]
+    average_times = [RESULTS['data/sppnw41.txt'][algorithm]['average_time'] for algorithm in algorithms]
+    standard_deviations_time = [RESULTS['data/sppnw41.txt'][algorithm]['standard_deviation_time'] for algorithm in algorithms]
 
-    # Plot the averages and standard deviations of the costs gouped by algorithm 
-    plt.figure(figsize=(10, 5))
-    plt.bar(algorithms, average_costs, yerr=standard_deviations_cost, capsize=5)
-    plt.title('Average Cost and Standard Deviation of Cost')
-    plt.xlabel('Algorithm')
-    plt.ylabel('Cost')
+    X = file_paths
+    X = [name.split('/')[-1] for name in X]
+
+    x = np.arange(len(X))
+
+    plt.bar(x - 0.2, average_costs[0], width=0.2, label='BGA Improved', yerr=standard_deviations_cost[0])
+    plt.bar(x, average_costs[1], width=0.2, label='BGA Standard', yerr=standard_deviations_cost[1])
+    plt.bar(x + 0.2, average_costs[2], width=0.2, label='Simulated Annealing', yerr=standard_deviations_cost[2])
+
+    plt.xticks(x, X)
+    plt.xlabel('Dataset')
+    plt.ylabel('Average Cost')
+    plt.title('Average Cost of Each Algorithm')
+    plt.legend()
     plt.show()
-    
-    # Plot the averages and standard deviations of the times grouped by algorithm
-    plt.figure(figsize=(10, 5))
-    plt.bar(algorithms, average_times, yerr=standard_deviations_time, capsize=5)
-    plt.title('Average Time and Standard Deviation of Time')
-    plt.xlabel('Algorithm')
-    plt.ylabel('Time')
-    plt.show()  
+
+    # Now for the time
+    plt.bar(x - 0.2, average_times[0], width=0.2, label='BGA Improved', yerr=standard_deviations_time[0])
+    plt.bar(x, average_times[1], width=0.2, label='BGA Standard', yerr=standard_deviations_time[1])
+    plt.bar(x + 0.2, average_times[2], width=0.2, label='Simulated Annealing', yerr=standard_deviations_time[2])
+
+    plt.xticks(x, X)
+    plt.xlabel('Dataset')
+    plt.ylabel('Average Time')
+    plt.title('Average Time of Each Algorithm')
+    plt.legend()
+    plt.show()
     
 
 def save_results():
