@@ -1,3 +1,4 @@
+import random
 # Load the data from the text files 
 
 file_paths = ["data/sppnw41.txt", "data/sppnw42.txt", "data/sppnw43.txt"]
@@ -45,6 +46,13 @@ def load_flights(file_path = file_paths[0]):
     data = _load_data(file_path)
     # The first item is the number of rows and columns we want to return then number if rows
     return data[0]
+
+def get_random_dataset():
+    random_file_path = random.choice(file_paths)
+    attendants = load_attendants(random_file_path)
+    flights = load_flights(random_file_path)
+    return attendants, flights
+
 
 
 
