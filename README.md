@@ -11,6 +11,8 @@ python BGA_improved.py
 python simulated_annealing.py
 ```
 
+No extra libraries are required to run these scripts, but if you which to run the ones below you will need to install the requirements.txt file.
+
 To run all the algorithms on each data set once, you can run the following command:
 
 ```bash
