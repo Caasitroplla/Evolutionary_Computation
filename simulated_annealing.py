@@ -4,7 +4,7 @@ import math
 import random
 
 def generate_initial_schedule(flights, crew):
-    # Generate a random schedule for the flights 
+    # Generate a random schedule for the flights
     schedule = {}
     for flight in flights:
         eligible_crew = [crew_member for crew_member in crew if flight in crew[crew_member]['flights']]
@@ -23,7 +23,7 @@ def get_neighbour(schedule, crew):
         neighbour[flight] = random.choice(eligible_crew)
     return neighbour
 
-def simulated_annealing(flights, crew, temperature=100000000, cooling_rate=0.99, min_temperature=1):
+def simulated_annealing(flights, crew, temperature=10000, cooling_rate=0.99, min_temperature=1):
     # Initialize the schedule
     current_schedule = generate_initial_schedule(flights, crew)
     current_cost = calculate_schedule_cost(current_schedule, crew)
@@ -53,7 +53,7 @@ def simulated_annealing(flights, crew, temperature=100000000, cooling_rate=0.99,
         temperature = max(temperature, min_temperature)
 
     return best_schedule, best_cost
-    
+
 
 if __name__ == "__main__":
     # Load the data
@@ -68,5 +68,4 @@ if __name__ == "__main__":
     # Print the best schedule and cost
     print(f"Best schedule: {best_schedule}")
     print(f"Best cost: {best_cost}")
-    
-    
+

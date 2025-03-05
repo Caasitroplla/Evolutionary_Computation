@@ -5,12 +5,10 @@ import BGA_standard
 import simulated_annealing
 import data_loader
 import numpy as np
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 import timeit
 import logging
 
-POPULATION_SIZE = 30
-GENERATIONS = 10
 
 if __name__ == "__main__":
     logging.basicConfig(
@@ -23,12 +21,12 @@ if __name__ == "__main__":
         filemode="w"
     )
 
-    # Load the data sets 
+    # Load the data sets
     num_data_sets = len(data_loader.file_paths)
 
     results = []
 
-    # Run the algorithm for each data set and add to results 
+    # Run the algorithm for each data set and add to results
     results = {
         'BGA Improved' : [],
         'BGA Standard' : [],
@@ -41,28 +39,33 @@ if __name__ == "__main__":
         'Simulated Annealing' : []
     }
 
+    # For simulated annealing and BGA to be doing the same ammounr of runs:
+    SA_RUNS = 10000
+    BGA_POPULATION_SIZE = 10
+    BGA_GENERATIONS = 990
+
     for i in range(num_data_sets):
-        # Load the data sets 
+        # Load the data sets
         num_flights = data_loader.load_flights(data_loader.file_paths[i])
         flights = list(range(1, num_flights))
         attendants = data_loader.load_attendants(data_loader.file_paths[i])
 
-        # Run the algorithms 
+        # Run the algorithms
         logging.info(f"Running BGA Improved for {data_loader.file_paths[i]}")
         start_time = timeit.default_timer()
-        BGA_improved_results = BGA_improved.binary_genetic_algorithm(flights, attendants, POPULATION_SIZE, GENERATIONS)
+        BGA_improved_results = BGA_improved.binary_genetic_algorithm(flights, attendants, BGA_POPULATION_SIZE, BGA_GENERATIONS)
         end_time = timeit.default_timer()
         timings['BGA Improved'].append(end_time - start_time)
 
         logging.info(f"Running BGA Standard for {data_loader.file_paths[i]}")
         start_time = timeit.default_timer()
-        BGA_standard_results = BGA_standard.binary_genertic_algorithm(flights, attendants, POPULATION_SIZE, GENERATIONS)
+        BGA_standard_results = BGA_standard.binary_genertic_algorithm(flights, attendants, BGA_POPULATION_SIZE, BGA_GENERATIONS)
         end_time = timeit.default_timer()
         timings['BGA Standard'].append(end_time - start_time)
 
         logging.info(f"Running Simulated Annealing for {data_loader.file_paths[i]}")
         start_time = timeit.default_timer()
-        simulated_annealing_results = simulated_annealing.simulated_annealing(flights, attendants)
+        simulated_annealing_results = simulated_annealing.simulated_annealing(flights, attendants, temperature=SA_RUNS)
         end_time = timeit.default_timer()
         timings['Simulated Annealing'].append(end_time - start_time)
 
@@ -71,7 +74,7 @@ if __name__ == "__main__":
         results['Simulated Annealing'].append(simulated_annealing_results[1])
 
 
-    # Plot the cost of each algorithms results 
+    # Plot the cost of each algorithms results
 
     algorithm = ("BGA Improved", "BGA Standard", "Simulated Annealing")
 
@@ -84,7 +87,7 @@ if __name__ == "__main__":
     x = np.arange(len(data_set_names))
     width = 0.25
     multiplier = 0
-        
+
     fig, ax = plt.subplots(layout='constrained')
 
     for attribute, measurements in results.items():
@@ -98,9 +101,9 @@ if __name__ == "__main__":
     ax.set_xticks(x + width, data_set_names)
     ax.legend(loc='upper left', ncols=3)
 
-    plt.show()  
-    
-    # Plot the time taken for each algorithm 
+    plt.show()
+
+    # Plot the time taken for each algorithm
 
     logging.info(f"Plotting the time taken for each algorithm")
 
@@ -119,4 +122,3 @@ if __name__ == "__main__":
 
     plt.show()
 
-        
